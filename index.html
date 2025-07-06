@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أطلب سائق دلفري | وجهتك للتوصيل الموثوق</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa&display=swap" rel="stylesheet">
+    <style>
+    /* إخفاء أيقونات التوصيل في الشعارات إذا لم تكن مطلوبة */
+    .logo .delivery-icon,
+    .nav-logo .delivery-icon,
+    .footer-logo .delivery-icon {
+        display: none;
+    }
+
+    /* تعريف المتغيرات الأساسية للألوان والانتقالات والظلال */
+    :root {
+        --primary-color: #2c3e50; /* أزرق داكن/رمادي لأساس التصميم */
+        --secondary-color: #e74c3c; /* أحمر جذاب للتمييز */
+        --accent-color: #3498db; /* أزرق فاتح للتركيز */
+        --light-color: #ecf0f1; /* لون فاتح للنصوص والخلفيات الخفيفة */
+        --dark-color: #1e2029; /* لون داكن جداً للنصوص الرئيسية والخلفيات الداكنة */
+        --overlay-color: rgba(0, 0, 0, 0.8); /* طبقة شفافة سوداء أغمق قليلاً */
+        --transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); /* انتقال سلس */
+        --fast-transition: all 0.3s ease; /* انتقال سريع */
+        --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.2); /* ظل أصغر وأكثر نعومة */
+        --glass-effect: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)); /* تأثير الزجاج */
+    }
+
+    /* إعادة تعيين الأنماط الافتراضية للعناصر */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Tajawal', sans-serif;
+    }
+
+    /* أنماط الجسم الأساسية */
+    body {
+        background-color: #f8f9fa;
+        color: var(--dark-color);
+        overflow-x: hidden;
+        line-height: 1.6;
+        font-size: 0.95rem; /* حجم الخط الأساسي أصغر قليلاً */
+    }
+
+    /* شاشة البداية (Splash Screen) */
+    .splash-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        transition: opacity 1s ease, visibility 1s ease;
+    }
+
+    .splash-screen.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .logo {
+        font-size: 3.5rem;
+        font-weight: 900;
+        background: linear-gradient(45deg, var(--accent-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 2rem;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 1s ease forwards 0.5s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    /* حركة أيقونة التوصيل في شاشة البداية */
+    @keyframes bounceAndRotate {
+        0%, 100% {
+            transform: translateY(0) rotate(0deg);
+        }
+        50% {
+            transform: translateY(-10px) rotate(10deg);
+        }
+    }
+
+    .loading-container {
+        width: 300px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        overflow: hidden;
+        opacity: 0;
+        animation: fadeIn 0.8s ease forwards 1s;
+    }
+
+    .loading-bar {
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
+        transition: width 2.5s ease;
+        border-radius: 4px;
+    }
+
+    /* حركات عامة */
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* الحاوية الرئيسية للتطبيق */
+    .app-container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* شريط التنقل (Navigation Bar) */
+    .nav-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 70px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 900;
+        backdrop-filter: blur(8px);
+        background: rgba(42, 45, 59, 0.8);
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.15);
+        padding: 0 25px;
+    }
+
+    .nav-logo {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--light-color);
+        margin-right: auto;
+        background: linear-gradient(45deg, var(--accent-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* قسم البطل (Hero Section) - منطقة الهبوط الرئيسية */
+    .hero-section {
+        position: relative;
+        padding: 100px 25px 70px;
+        background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+        color: white;
+        text-align: center;
+        margin-bottom: 40px;
+        /* تم إزالة clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%); لجعل الحافة مستقيمة */
+        min-height: 75vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .hero-content {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+        opacity: 0;
+        animation: fadeIn 1.2s ease forwards 0.5s;
+    }
+
+    .hero-content h1 {
+        font-size: 3rem;
+        margin-bottom: 1.2rem;
+        font-weight: 900;
+        background: linear-gradient(45deg, var(--accent-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: fadeInSlideUp 1s ease forwards 0.8s; /* حركة ظهور أكثر سلاسة */
+    }
+
+    .hero-content .main-description {
+        font-size: 1.2rem;
+        margin-bottom: 1.8rem;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInSlideUp 0.8s ease forwards 1.3s;
+    }
+
+    /* حركة الظهور لأعلى */
+    @keyframes fadeInSlideUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animated-text-container {
+        position: relative;
+        margin-bottom: 1.8rem;
+        height: auto;
+        text-align: justify;
+        direction: rtl;
+        perspective: 1000px;
+    }
+
+    .animated-text-layer {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 18px 25px;
+        margin-bottom: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(5px);
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        text-align: justify;
+        line-height: 1.7;
+    }
+
+    .animated-text-layer p {
+        font-size: 0.95rem;
+        color: var(--light-color);
+        margin: 0;
+    }
+
+    .animated-text-layer:nth-child(1) { animation: fadeInSlideUp 0.8s ease forwards 2s; }
+    .animated-text-layer:nth-child(2) { animation: fadeInSlideUp 0.8s ease forwards 2.3s; }
+    .animated-text-layer:nth-child(3) { animation: fadeInSlideUp 0.8s ease forwards 2.6s; }
+    .animated-text-layer:nth-child(4) { animation: fadeInSlideUp 0.8s ease forwards 2.9s; }
+
+    @keyframes bounceIn { /* لم تعد تُستخدم مباشرة لـ h1 ولكن تظل موجودة إذا كانت هناك عناصر أخرى تستخدمها */
+        0% { transform: scale(0.3); opacity: 0; }
+        50% { transform: scale(1.1); opacity: 1; }
+        70% { transform: scale(0.9); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* حاوية نص التوجيه "للعثور على السائق الأنسب لكم..." */
+    .hero-end-text-container {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--light-color);
+        margin-top: 30px;
+        opacity: 0;
+        transform: translateY(0); /* التأكد من عدم وجود ميل في البداية */
+        animation: fadeInSlideUp 0.8s ease forwards 3.2s;
+        text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        padding: 15px 25px;
+        background: var(--glass-effect);
+        border-radius: 15px;
+        border: 1px solid rgba(255,255,255,0.15);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        animation: pulse-glow 2s infinite alternate ease-in-out;
+        display: block; /* لضمان عمل الانتقال */
+    }
+
+    .hero-end-text-container.hidden {
+        opacity: 0 !important;
+        transform: translateY(20px) !important;
+        pointer-events: none; /* تعطيل التفاعل عندما يكون مخفياً */
+        display: none; /* إخفائه تماماً من التدفق عند إخفائه */
+    }
+
+    @keyframes pulse-glow {
+        0% {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3), 0 0 0px var(--accent-color);
+        }
+        100% {
+            box-shadow: 0 5px 25px rgba(0,0,0,0.4), 0 0 15px var(--accent-color);
+        }
+    }
+
+    /* حاوية الصورة والآية القرآنية */
+    .islamic-feature-area {
+        margin-top: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(0); /* التأكد من عدم وجود ميل في البداية */
+        animation: fadeInSlideUp 1s ease forwards 3.5s;
+    }
+
+    /* الصورة (sss.jpg) - ثابتة وبدون توهج وبحجمها الطبيعي */
+    .islamic-feature-image {
+        max-width: 450px; /* حجم كبير وواضح */
+        height: auto; /* لضمان الحفاظ على نسبة العرض إلى الارتفاع */
+        display: block; /* لضمان التعامل معها ككتلة */
+        margin: 0 auto; /* لتوسيط الصورة */
+        mix-blend-mode: multiply; /* يساعد في دمج الخلفية البيضاء للصورة مع الخلفية الداكنة */
+        background-color: transparent; /* تأكد من عدم وجود خلفية مفروضة */
+        /* تم إزالة animation هنا لجعلها ثابتة */
+    }
+
+    /* الآية القرآنية */
+    .quranic-line {
+        font-family: 'Aref Ruqaa', serif; /* خط عربي أنيق */
+        font-size: 1.8rem;
+        color: var(--accent-color);
+        margin-top: 25px;
+        margin-bottom: 15px;
+        text-shadow: none; /* إزالة أي ظل نصي قد يظهر مائلاً */
+        line-height: 1.5;
+    }
+
+    /* نص الرؤية (معاً نحو مستقبل أفضل) */
+    .vision-text {
+        font-size: 1.1rem;
+        color: var(--light-color);
+        margin-top: 10px;
+        font-weight: 500;
+        text-shadow: none; /* إزالة أي ظل نصي قد يظهر مائلاً */
+    }
+
+    /* حاوية النص الطويل الجديد (قسم خدمات التوصيل قطاع العراق الخاص) */
+    .main-call-to-action-text-container {
+        font-size: 1rem;
+        color: var(--light-color);
+        text-align: justify;
+        line-height: 1.8;
+        margin: 40px auto;
+        max-width: 700px;
+        padding: 30px; /* زيادة التباعد الداخلي */
+        background: radial-gradient(circle at top right, rgba(52, 152, 219, 0.2), rgba(28, 30, 38, 0.95)); /* خلفية متدرجة أغمق وأكثر احترافية */
+        border-radius: 20px; /* زوايا دائرية أكبر */
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.1); /* ظل أكبر مع حدود داخلية خفيفة */
+        backdrop-filter: blur(20px) brightness(1.2) contrast(1.1); /* تمويه أقوى وتشبع لوني */
+        border: 2px solid rgba(255, 255, 255, 0.15); /* حد أبيض شفاف خفيف */
+        opacity: 0;
+        transform: translateY(30px) perspective(800px) rotateX(8deg); /* تأثير ثلاثي الأبعاد خفيف عند الظهور */
+        animation: fadeInSlideUpRotated 0.8s ease forwards 4.2s; /* استخدام حركة جديدة */
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); /* انتقال سلس لجميع الخصائص */
+        position: relative; /* مهم للزر المطلق */
+        overflow: hidden; /* لإخفاء أي جزء من الظل أو التوهج يخرج عن الحاوية */
+    }
+
+    /* حركة الظهور لأعلى مع دوران خفيف */
+    @keyframes fadeInSlideUpRotated {
+        to {
+            opacity: 1;
+            transform: translateY(0) perspective(800px) rotateX(0deg);
+        }
+    }
+
+    /* الطبقات الداخلية للنص الطويل لتمييزها */
+    .main-call-to-action-text-container .section-heading-new {
+        font-size: 1.8rem; /* حجم أكبر للعنوان */
+        font-weight: 800; /* خط أسمك */
+        background: linear-gradient(45deg, var(--secondary-color), var(--accent-color)); /* تدرج لوني للعنوان */
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent; /* لجعل التدرج مرئياً */
+        margin-bottom: 25px; /* مسافة أكبر أسفل العنوان */
+        text-align: center;
+        position: relative;
+        padding-bottom: 15px;
+    }
+
+    .main-call-to-action-text-container .section-heading-new::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px; /* خط أطول قليلاً */
+        height: 4px; /* خط أسمك */
+        background: linear-gradient(90deg, var(--secondary-color), var(--accent-color)); /* تدرج لوني للخط */
+        border-radius: 2px;
+    }
+
+    .main-call-to-action-text-container .text-layer {
+        background: rgba(255, 255, 255, 0.08); /* خلفية أفتح قليلاً للطبقات الداخلية */
+        padding: 20px; /* تباعد داخلي أكبر */
+        border-radius: 12px; /* زوايا دائرية أكبر */
+        margin-bottom: 20px; /* مسافة أكبر بين الطبقات */
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), inset 0 0 8px rgba(255, 255, 255, 0.08); /* ظل مع توهج داخلي */
+        backdrop-filter: blur(8px); /* تمويه إضافي للطبقات */
+        border: 1px solid rgba(255, 255, 255, 0.15); /* حد أبيض شفاف */
+        transition: transform 0.3s ease, box-shadow 0.3s ease; /* إضافة انتقال عند التمرير */
+        text-align: justify; /* لضمان محاذاة النص justify */
+    }
+
+    .main-call-to-action-text-container .text-layer:last-of-type {
+        margin-bottom: 0; /* إزالة الهامش السفلي لآخر طبقة */
+    }
+
+    .main-call-to-action-text-container .text-layer:hover {
+        transform: translateY(-5px); /* حركة رفع عند التمرير */
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(255, 255, 255, 0.1);
+    }
+
+    .main-call-to-action-text-container .text-layer p {
+        color: var(--light-color); /* التأكد من لون النص الفاتح */
+        font-size: 0.98rem; /* تعديل حجم الخط قليلاً */
+        line-height: 1.7; /* مسافات أسطر مريحة */
+    }
+
+    .main-call-to-action-text-container .highlight-bold {
+        font-weight: 900; /* خط أسمك جداً للتمييز */
+        color: var(--secondary-color); /* لون التمييز الأحمر الجذاب */
+        text-shadow: 0 0 12px rgba(231, 76, 60, 0.9); /* توهج حول النص المميز */
+        transition: text-shadow 0.3s ease;
+    }
+
+    .main-call-to-action-text-container .highlight-bold:hover {
+        text-shadow: 0 0 20px rgba(231, 76, 60, 1);
+    }
+
+    /* الزر الاحترافي الجديد لـ "تصفح المحافظات" داخل حاوية النص الطويل */
+    #browse-provinces-instruction {
+        display: inline-block; /* ليتصرف كزر ويمكن تطبيق البادينغ والظلال */
+        margin-top: 30px; /* مسافة من المحتوى العلوي */
+        padding: 15px 30px; /* تباعد داخلي كبير لجعله زرًا واضحًا */
+        background: linear-gradient(90deg, #3498db, #e74c3c); /* تدرج لوني جذاب */
+        color: white;
+        font-size: 1.2rem; /* حجم خط أكبر */
+        font-weight: 700; /* خط سميك */
+        border-radius: 50px; /* زوايا دائرية جدًا تشبه حبوب الدواء */
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 25px rgba(52, 152, 219, 0.8); /* ظل عميق مع توهج لوني */
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* انتقال ارتدادي سلس */
+        text-align: center;
+        text-decoration: none; /* إزالة أي خطوط تحت النص */
+        animation: glow-pulse 2s infinite alternate ease-in-out; /* حركة توهج ونبض */
+        border: none; /* إزالة الحدود الافتراضية للزر */
+        display: block; /* لكي يأخذ كامل العرض المتاح له */
+        width: fit-content; /* عرض على قد المحتوى */
+        margin-left: auto;
+        margin-right: auto; /* لتوسيط الزر */
+    }
+
+    /* حركة التوهج والنبض لزر "تصفح المحافظات" */
+    @keyframes glow-pulse {
+        0% {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 25px rgba(52, 152, 219, 0.8);
+            transform: translateY(0) scale(1);
+        }
+        50% {
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), 0 0 35px rgba(231, 76, 60, 0.9);
+            transform: translateY(-5px) scale(1.02);
+        }
+        100% {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 25px rgba(52, 152, 219, 0.8);
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    #browse-provinces-instruction:hover {
+        background: linear-gradient(90deg, #288fca, #c0392b); /* تغيير طفيف في التدرج عند التمرير */
+        transform: translateY(-8px) scale(1.05); /* رفع أكبر وتكبير أكثر */
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 40px rgba(231, 76, 60, 1); /* ظل وتوهج أقوى */
+        animation: none; /* إيقاف الحركة عند التمرير */
+    }
+
+    #browse-provinces-instruction p {
+        color: white !important; /* التأكد من أن النص أبيض */
+        font-weight: 700;
+        margin: 0; /* إزالة أي هوامش داخلية من عنصر الفقرة */
+    }
+
+    /* كلاس لإخفاء العناصر */
+    .main-call-to-action-text-container.hidden {
+        opacity: 0 !important;
+        transform: translateY(20px) !important;
+        pointer-events: none; /* تعطيل التفاعل عندما يكون مخفياً */
+        display: none; /* إخفائه تماماً من التدفق */
+    }
+
+    /* المحتوى الرئيسي (لفئات السائقين) */
+    .main-content {
+        flex: 1;
+        padding-top: 40px;
+    }
+
+    /* أقسام الفئات (المحافظات) */
+    .category-section {
+        display: none; /* مخفي افتراضياً */
+        padding: 40px 25px;
+        animation: fadeIn 0.8s ease;
+        text-align: right;
+        direction: rtl;
+    }
+
+    .category-section.active {
+        display: block;
+    }
+
+    .section-title {
+        text-align: center;
+        margin-bottom: 35px;
+        font-size: 2.3rem;
+        font-weight: 700;
+        position: relative;
+        padding-bottom: 15px;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%); /* هذا يجعل الخط مستقيماً أفقياً */
+        width: 70px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
+        border-radius: 2px;
+    }
+
+    /* شبكة المعرض (لكروت السائقين) */
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 20px;
+        justify-content: center;
+    }
+
+    .gallery-item {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease;
+        aspect-ratio: 3/4;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .gallery-item:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .gallery-img-wrapper {
+        flex-grow: 1;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--primary-color);
+    }
+
+    .gallery-img {
+        width: 80%;
+        height: 80%;
+        object-fit: cover;
+        display: block;
+        border-radius: 50%;
+        transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-radius 0.4s ease;
+        position: relative;
+        z-index: 1;
+        border: 5px solid var(--accent-color);
+        box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+    }
+
+    .gallery-item:hover .gallery-img {
+        transform: scale(1.08);
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 25px rgba(231, 76, 60, 0.7);
+    }
+
+    .img-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        z-index: 2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        color: white;
+        font-size: 1.4rem;
+        font-weight: 700;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        border-radius: 12px;
+    }
+
+    .gallery-item:hover .img-overlay {
+        opacity: 1;
+    }
+
+    .driver-info-preview {
+        background-color: var(--primary-color);
+        color: var(--light-color);
+        padding: 12px;
+        font-size: 1rem;
+        font-weight: 700;
+        text-align: center;
+        display: block;
+        overflow: hidden;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        direction: rtl;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    .driver-info-preview h3 {
+        margin: 0 0 4px;
+        font-size: 1.2em;
+        color: var(--light-color);
+        opacity: 0.9;
+    }
+    .driver-info-preview p {
+        margin: 0;
+        font-size: 0.9em;
+        color: var(--light-color);
+        opacity: 0.8;
+        line-height: 1.4;
+    }
+
+    /* اللايت بوكس (Lightbox) - تفاصيل السائق */
+    .lightbox {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--overlay-color);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(8px);
+        padding: 15px;
+    }
+
+    .lightbox.active {
+        display: flex;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .lightbox-content {
+        position: relative;
+        max-width: 420px;
+        background-color: var(--light-color);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 30px;
+        color: var(--dark-color);
+        text-align: center;
+        transform: scale(0.9);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .lightbox.active .lightbox-content {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .lightbox-driver-img {
+        max-width: 140px;
+        height: 140px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid var(--accent-color);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        margin-bottom: 18px;
+    }
+
+    .lightbox-info {
+        direction: rtl;
+        text-align: center;
+    }
+
+    .lightbox-info h3 {
+        font-size: 2rem;
+        margin-bottom: 6px;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+    .lightbox-info p {
+        font-size: 1rem;
+        margin-bottom: 12px;
+        color: var(--dark-color);
+    }
+    .lightbox-info p strong {
+        color: var(--secondary-color);
+    }
+    /* رابط الاتصال بالهاتف */
+    .lightbox-info a.phone-link {
+        display: inline-block;
+        background-color: var(--accent-color);
+        color: white;
+        padding: 9px 18px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: bold;
+        margin-top: 8px;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        font-size: 0.95rem;
+    }
+    .lightbox-info a.phone-link:hover {
+        background-color: #288fca;
+        transform: translateY(-2px);
+    }
+
+    .lightbox-social-links {
+        margin-top: 18px;
+        display: flex;
+        justify-content: center;
+        gap: 18px;
+        width: 100%;
+    }
+
+    .lightbox-social-links a.social-icon {
+        font-size: 2rem;
+        color: var(--primary-color);
+        transition: transform 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    /* حركة أيقونات التواصل الاجتماعي */
+    .lightbox.active .lightbox-social-links a.social-icon:nth-child(1) { animation: fadeInSlideUp 0.5s forwards 0.2s; }
+    .lightbox.active .lightbox-social-links a.social-icon:nth-child(2) { animation: fadeInSlideUp 0.5s forwards 0.3s; }
+    .lightbox.active .lightbox-social-links a.social-icon:nth-child(3) { animation: fadeInSlideUp 0.5s forwards 0.4s; }
+    .lightbox.active .lightbox-social-links a.social-icon:nth-child(4) { animation: fadeInSlideUp 0.5s forwards 0.5s; }
+
+    .lightbox-social-links a.social-icon:hover {
+        transform: translateY(-4px) scale(1.1);
+        color: var(--accent-color);
+    }
+    /* ألوان التمرير لأيقونات التواصل الاجتماعي */
+    .lightbox-social-links a.social-icon.facebook-icon:hover { color: #1877F2; }
+    .lightbox-social-links a.social-icon.instagram-icon:hover { color: #E4405F; }
+    .lightbox-social-links a.social-icon.whatsapp-icon:hover { color: #25D366; }
+    .lightbox-social-links a.social-icon.tiktok-icon:hover { color: #000000; }
+
+    /* زر إغلاق اللايت بوكس */
+    .lightbox-close {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        width: 32px;
+        height: 32px;
+        background: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 1.1rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: var(--fast-transition);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .lightbox-close:hover {
+        background: var(--accent-color);
+        transform: rotate(90deg) scale(1.05);
+    }
+
+    /* زر الإجراء العائم (FAB) لتصفح المحافظات */
+    .fab-container-browse {
+        position: fixed;
+        bottom: 25px;
+        left: 25px;
+        z-index: 950;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: flex-start;
+    }
+
+    .fab-button-browse {
+        padding: 13px 22px;
+        border-radius: 50px;
+        background: linear-gradient(45deg, var(--accent-color), var(--secondary-color));
+        color: white;
+        border: none;
+        font-size: 1.05rem;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55),
+                                 box-shadow 0.3s ease;
+        position: relative;
+        z-index: 10;
+        animation: float-pulse 2s infinite alternate ease-in-out; /* حركة طفو ونبض */
+    }
+
+    /* حركة الطفو والنبض لزر FAB */
+    @keyframes float-pulse {
+        0% {
+            transform: translateY(0);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        50% {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+        }
+        100% {
+            transform: translateY(0);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+    }
+
+    .fab-button-browse:hover {
+        transform: translateY(-7px) scale(1.04);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        animation: none; /* إيقاف الحركة عند التمرير */
+    }
+
+    /* قائمة FAB (المحافظات) */
+    .fab-menu-browse {
+        display: flex;
+        flex-direction: column; /* عمودي */
+        gap: 10px;
+        position: absolute;
+        bottom: 70px;
+        align-items: flex-start;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(20px) scale(0.9);
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        padding: 10px;
+        background: rgba(42, 45, 59, 0.85);
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        transform-origin: bottom left;
+        max-width: 180px;
+        left: 0;
+        right: unset;
+    }
+
+    .fab-menu-browse.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+    }
+
+    .fab-menu-item-browse {
+        background: var(--glass-effect);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: var(--light-color);
+        padding: 8px 15px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.8rem; /* حجم خط أصغر */
+        white-space: nowrap;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        transition: all 0.2s ease-out;
+        opacity: 0;
+        transform: translateX(-10px);
+        width: 100%;
+        text-align: right;
+    }
+
+    .fab-menu-browse.active .fab-menu-item-browse {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .fab-menu-item-browse:hover {
+        background: rgba(232, 62, 140, 0.2);
+        border-color: rgba(232, 62, 140, 0.3);
+        transform: translateX(5px);
+    }
+    
+    /* تذييل الصفحة (Footer) */
+    footer {
+        background-color: var(--dark-color);
+        color: var(--light-color);
+        text-align: center;
+        padding: 50px 25px 35px;
+        margin-top: 40px;
+        direction: rtl;
+    }
+
+    .footer-content {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .footer-logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        background: linear-gradient(45deg, var(--accent-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .social-links {
+        margin-top: 1.8rem;
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .social-links a {
+        display: inline-block;
+        color: var(--light-color);
+        font-size: 1.4rem;
+        margin: 0 10px;
+        transition: var(--transition);
+    }
+
+    .social-links a:hover {
+        color: var(--accent-color);
+        transform: translateY(-4px);
+    }
+
+    .copyright {
+        margin-top: 1.5rem;
+        opacity: 0.8;
+        font-size: 0.9rem;
+    }
+
+    /* التصميم المتجاوب (Responsive Design) */
+    @media (max-width: 1200px) {
+        body { font-size: 0.92rem; }
+        .hero-content .main-description { font-size: 1.15rem; }
+        .animated-text-layer p { font-size: 0.9rem; }
+        .section-title {
+            font-size: 2.1rem;
+        }
+        .gallery-grid {
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        }
+        .islamic-feature-image {
+            max-width: 400px; /* يمكن التحكم في الحجم هنا بشكل متجاوب إذا لم يكن الحجم الطبيعي مناسبًا */
+        }
+        .quranic-line {
+            font-size: 1.6rem;
+        }
+        .vision-text {
+            font-size: 1rem;
+        }
+        /* تعديلات متجاوبة للحاوية الرئيسية الجديدة */
+        .main-call-to-action-text-container {
+            padding: 25px;
+            margin: 35px auto;
+        }
+        .main-call-to-action-text-container .section-heading-new {
+            font-size: 1.7rem;
+        }
+        .main-call-to-action-text-container .text-layer {
+            padding: 18px;
+        }
+        .main-call-to-action-text-container .text-layer p {
+            font-size: 0.95rem;
+        }
+        #browse-provinces-instruction {
+            font-size: 1.1rem;
+            padding: 12px 25px;
+        }
+    }
+
+    @media (max-width: 992px) {
+        body { font-size: 0.9rem; }
+        .hero-content h1 {
+            font-size: 2.6rem;
+        }
+        .hero-content .main-description {
+            font-size: 1.05rem;
+        }
+        .animated-text-layer p {
+            font-size: 0.88rem;
+        }
+        .hero-end-text-container {
+            font-size: 1.15rem;
+            padding: 12px 20px;
+        }
+        .islamic-feature-image {
+            max-width: 350px; /* يمكن التحكم في الحجم هنا بشكل متجاوب */
+        }
+        .quranic-line {
+            font-size: 1.4rem;
+        }
+        .vision-text {
+            font-size: 0.95rem;
+        }
+        .lightbox-info h3 {
+            font-size: 1.8rem;
+        }
+        .lightbox-info p {
+            font-size: 1rem;
+        }
+        .lightbox-social-links a {
+            font-size: 1.8rem;
+        }
+        /* تعديلات متجاوبة للحاوية الرئيسية الجديدة */
+        .main-call-to-action-text-container {
+            padding: 20px;
+            margin: 30px auto;
+        }
+        .main-call-to-action-text-container .section-heading-new {
+            font-size: 1.6rem;
+        }
+        .main-call-to-action-text-container .text-layer {
+            padding: 15px;
+        }
+        .main-call-to-action-text-container .text-layer p {
+            font-size: 0.92rem;
+        }
+        #browse-provinces-instruction {
+            font-size: 1rem;
+            padding: 10px 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        body { font-size: 0.88rem; }
+        .logo {
+            font-size: 2.5rem;
+        }
+        .logo .delivery-icon {
+            font-size: 0.8em;
+        }
+        .nav-logo {
+            font-size: 1.4rem;
+        }
+        .nav-logo .delivery-icon {
+            font-size: 0.9em;
+        }
+        .footer-logo {
+            font-size: 1.6rem;
+        }
+        .footer-logo .delivery-icon {
+            font-size: 0.9em;
+        }
+        .hero-content h1 {
+            font-size: 2rem;
+        }
+        .hero-content .main-description {
+            font-size: 0.85rem;
+        }
+        .animated-text-layer {
+            padding: 12px 18px;
+        }
+        .animated-text-layer p {
+            font-size: 0.82rem;
+        }
+        .hero-end-text-container {
+            font-size: 1rem;
+            padding: 10px 18px;
+        }
+        .islamic-feature-image {
+            max-width: 300px; /* يمكن التحكم في الحجم هنا بشكل متجاوب */
+        }
+        .quranic-line {
+            font-size: 1.2rem;
+        }
+        .vision-text {
+            font-size: 0.9rem;
+        }
+        .section-title {
+            font-size: 1.8rem;
+        }
+        .gallery-grid {
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+        }
+        .lightbox-close {
+            top: 10px;
+            left: 10px;
+            width: 30px;
+            height: 30px;
+            font-size: 1rem;
+        }
+
+        .fab-button-browse {
+            padding: 10px 18px;
+            font-size: 0.9rem;
+        }
+        .fab-container-browse {
+            bottom: 20px;
+            left: 20px;
+        }
+
+        .fab-menu-browse {
+            flex-direction: column;
+            bottom: 60px;
+            gap: 8px;
+            padding: 6px;
+            max-width: 150px; /* لتحديد أقصى عرض للقائمة على الشاشات الأصغر */
+            left: 0;
+            right: unset;
+            transform-origin: bottom left;
+        }
+        .fab-menu-item-browse {
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            margin: 0;
+            transition-delay: 0s !important;
+        }
+        .fab-menu-browse.active .fab-menu-item-browse {
+            animation: none !important;
+            transform: translateX(0);
+        }
+        .fab-menu-item-browse:hover {
+            transform: translateX(2px);
+        }
+
+        footer {
+            padding: 40px 20px 30px;
+        }
+        .social-links a {
+            font-size: 1.3rem;
+            margin: 0 8px;
+        }
+        .copyright {
+            font-size: 0.85rem;
+        }
+        /* تعديلات متجاوبة للحاوية الرئيسية الجديدة */
+        .main-call-to-action-text-container {
+            padding: 15px;
+            margin: 25px auto;
+        }
+        .main-call-to-action-text-container .section-heading-new {
+            font-size: 1.4rem;
+        }
+        .main-call-to-action-text-container .text-layer {
+            padding: 12px;
+        }
+        .main-call-to-action-text-container .text-layer p {
+            font-size: 0.9rem;
+        }
+        #browse-provinces-instruction {
+            font-size: 0.9rem;
+            padding: 8px 15px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        body { font-size: 0.82rem; }
+        .logo {
+            font-size: 2rem;
+        }
+        .hero-content h1 {
+            font-size: 1.6rem;
+        }
+        .hero-content .main-description {
+            font-size: 0.8rem;
+        }
+        .animated-text-layer p {
+            font-size: 0.78rem;
+        }
+        .hero-end-text-container {
+            font-size: 0.9rem;
+            padding: 8px 15px;
+        }
+        .islamic-feature-image {
+            max-width: 250px; /* يمكن التحكم في الحجم هنا بشكل متجاوب */
+        }
+        .quranic-line {
+            font-size: 1rem;
+            margin-top: 20px;
+        }
+        .vision-text {
+            font-size: 0.85rem;
+        }
+        .section-title {
+            font-size: 1.6rem;
+        }
+        .gallery-grid {
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        .fab-menu-browse {
+            max-width: 120px; /* لتحديد أقصى عرض للقائمة على الشاشات الأصغر جداً */
+            padding: 5px;
+            gap: 5px;
+        }
+        .fab-menu-item-browse {
+            font-size: 0.65rem;
+            padding: 5px 8px;
+            margin: 0;
+        }
+        #browse-provinces-instruction {
+            font-size: 0.8rem;
+            padding: 7px 12px;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="splash-screen" id="splashScreen">
+        <div class="logo">
+            أطلب سائق دلفري
+            <i class="fas fa-box-open delivery-icon"></i> </div>
+        <div class="loading-container">
+            <div class="loading-bar" id="loadingBar"></div>
+        </div>
+    </div>
+
+    <div class="app-container" id="appContainer" style="display: none;">
+        <nav class="nav-container">
+            <div class="nav-logo">
+                أطلب سائق دلفري
+                <i class="fas fa-box-open delivery-icon"></i> </div>
+        </nav>
+
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>بسم الله الرحمن الرحيم</h1>
+                <p class="main-description">وجهتكم الموثوقة لربطكم بأمهر سائقي التوصيل وأكثرهم إخلاصاً في جميع محافظات العراق، سعياً لخدمتكم وتيسير أموركم بفضل الله.</p>
+                <div class="animated-text-container">
+                    <div class="animated-text-layer">
+                        <p>
+                            في ظل التوسع المتسارع في أنماط التجارة والخدمات داخل العراق، تبرز الحاجة إلى منصة تجمع الخير والعطاء، وتُيسّر على إخواننا وأخواتنا الوصول إلى خدمة التوصيل بكفاءة عالية، وتربط بين أصحاب الهمم من العاملين في التوصيل والجهات المستفيدة من شركات وأفراد، نفعاً وبركةً للجميع.
+                        </p>
+                    </div>
+                    <div class="animated-text-layer">
+                        <p>
+                            نتعاون معكم على البر والتقوى، ونسعى لإنشاء شبكة مباركة من سائقي التوصيل، هدفنا الأسمى:
+                        </p>
+                    </div>
+                    <div class="animated-text-layer">
+                        <p>
+                            - تمكين الطاقات الشبابية وتوفير فرص عمل كريمة ومستدامة في قطاع الخدمات اللوجستية، راجين من الله التوفيق والسداد.
+                        </p>
+                    </div>
+                    <div class="animated-text-layer">
+                        <p>
+                            - بناء قاعدة بيانات لسائقي التوصيل وفق معايير مهنية واضحة، لتسهيل تواصل الشركات والمطاعم معهم في كل محافظة، تيسيراً للأمور وطلباً للبركة.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="islamic-feature-area">
+                    <img src="sss.jpg" alt="خدمة التوصيل" class="islamic-feature-image">
+                    <p class="quranic-line">
+                        رِجَالٌ لَا تُلْهِيهِمْ تِجَارَةٌ وَلَا بَيْعٌ عَنْ ذِكْرِ اللَّهِ
+                    </p>
+                    <p class="vision-text">معاً نحو مستقبل أفضل</p>
+                </div>
+                
+                <div class="main-call-to-action-text-container" id="mainCallToActionText">
+                    <p class="section-heading-new">
+                        قسم خدمات التوصيل قطاع العراق الخاص
+                    </p>
+                    <div class="text-layer" id="text-layer-1">
+                        <p>
+                            هل تمتلك وسيلة توصيل ..؟ وتبحث عن فرصة عمل
+                        </p>
+                    </div>
+                    <div class="text-layer" id="text-layer-2">
+                        <p>
+                            هنا يبدأ العمل<br>
+                            أدرج اسمك ضمن قائمة عاملي التوصيل في محافظتك<br>
+                            ودع أصحاب المطاعم، الشركات، المتاجر والأعمال الحرة يصلون إليك مباشرة <br>
+                            بأجور يومية أسبوعية أو شهرية
+                        </p>
+                    </div>
+                    <div class="text-layer" id="text-layer-3">
+                        <p>
+                            دون وسطاء <br>
+                            دون انتظار<br>
+                            دون معاملات لا تنتهي <br>
+                            القطاع الخاص ليس جهة حكومية<br>
+                            ولا تابعاً لأي جهة سياسية.
+                        </p>
+                    </div>
+                    <div class="text-layer" id="text-layer-4">
+                        <p>
+                            القطاع الخاص هو واجهة العراق الاولى<br>
+                            بين من يملك الخدمة ومن يحتاجها لنختصر الطريق على الطرفين
+                        </p>
+                    </div>
+                    <div class="text-layer" id="text-layer-5">
+                        <p>
+                            <strong class="highlight-bold">ابدأ الآن.</strong><br>
+                            اكتب اسمك، حدّد محافظتك <br>
+                            واجعل عملك مرئيًا لكل من يبحث عنك.
+                        </p>
+                    </div>
+                    <div class="text-layer" id="browse-provinces-instruction">
+                        <p>
+                            اضغط الآن على أسفل يسار الشاشة كلمة **تصفح المحافظات** من أجل عرض الخدمات المقدمة 
+                        </p>
+                    </div>
+                </div>
+
+                <div class="hero-end-text-container" id="heroEndTextContainer">
+                    للعثور على السائق الأنسب لكم، تفضلوا **بالضغط على زر "تصفح المحافظات"** في الأسفل.
+                </div>
+            </div>
+        </section>
+
+        <main class="main-content">
+            <section id="anbar-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري الأنبار</h2>
+                <div class="gallery-grid" id="anbarDriversGallery"></div>
+            </section>
+            <section id="babil-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري بابل</h2>
+                <div class="gallery-grid" id="babilDriversGallery"></div>
+            </section>
+            <section id="baghdad-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري بغداد</h2>
+                <div class="gallery-grid" id="baghdadDriversGallery"></div>
+            </section>
+            <section id="basra-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري البصرة</h2>
+                <div class="gallery-grid" id="basraDriversGallery"></div>
+            </section>
+            <section id="duhok-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري دهوك</h2>
+                <div class="gallery-grid" id="duhokDriversGallery"></div>
+            </section>
+            <section id="diyala-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري ديالى</h2>
+                <div class="gallery-grid" id="diyalaDriversGallery"></div>
+            </section>
+            <section id="dhiqar-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري ذي قار</h2>
+                <div class="gallery-grid" id="dhiqarDriversGallery"></div>
+            </section>
+            <section id="erbil-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري أربيل</h2>
+                <div class="gallery-grid" id="erbilDriversGallery"></div>
+            </section>
+            <section id="karbala-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري كربلاء</h2>
+                <div class="gallery-grid" id="karbalaDriversGallery"></div>
+            </section>
+            <section id="kirkuk-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري كركوك</h2>
+                <div class="gallery-grid" id="kirkukDriversGallery"></div>
+            </section>
+            <section id="maysan-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري ميسان</h2>
+                <div class="gallery-grid" id="maysanDriversGallery"></div>
+            </section>
+            <section id="muthanna-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري المثنى</h2>
+                <div class="gallery-grid" id="muthannaDriversGallery"></div>
+            </section>
+            <section id="najaf-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري النجف</h2>
+                <div class="gallery-grid" id="najafDriversGallery"></div>
+            </section>
+            <section id="ninawa-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري نينوى</h2>
+                <div class="gallery-grid" id="ninawaDriversGallery"></div>
+            </section>
+            <section id="qadisiyah-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري القادسية</h2>
+                <div class="gallery-grid" id="qadisiyahDriversGallery"></div>
+            </section>
+            <section id="salahaddin-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري صلاح الدين</h2>
+                <div class="gallery-grid" id="salahaddinDriversGallery"></div>
+            </section>
+            <section id="sulaymaniyah-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري السليمانية</h2>
+                <div class="gallery-grid" id="sulaymaniyahDriversGallery"></div>
+            </section>
+            <section id="wasit-drivers-section" class="category-section">
+                <h2 class="section-title">سائقو دلفري واسط</h2>
+                <div class="gallery-grid" id="wasitDriversGallery"></div>
+            </section>
+        </main>
+
+        <div class="fab-container-browse" id="fab-container-browse">
+            <button class="fab-button-browse" id="fabButtonBrowse">
+                تصفح المحافظات
+            </button>
+            <div class="fab-menu-browse" id="fabMenuBrowse">
+                </div>
+        </div>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-logo">
+                    أطلب سائق دلفري
+                    <i class="fas fa-box-open delivery-icon"></i> </div>
+                <div class="social-links">
+                    <a href="#" aria-label="فيسبوك"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="انستغرام"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="واتساب"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#" aria-label="تيك توك"><i class="fab fa-tiktok"></i></a>
+                </div>
+                <p class="copyright">© 2024 أطلب سائق دلفري. جميع الحقوق محفوظة.</p>
+            </div>
+        </footer>
+    </div>
+
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-content">
+            <img class="lightbox-driver-img" id="lightboxDriverImg" src="" alt="صورة السائق">
+            <div class="lightbox-info">
+                <h3 id="lightboxDriverName"></h3>
+                <p><strong>العمر:</strong> <span id="lightboxDriverAge"></span></p>
+                <p><strong>نوع الدراجة:</strong> <span id="lightboxBikeType"></span></p>
+                <p>
+                    <a id="lightboxDriverPhone" href="" dir="ltr" class="phone-link"></a>
+                </p>
+                <div class="lightbox-social-links">
+                    <a id="lightboxDriverFacebook" href="#" target="_blank" class="social-icon facebook-icon" style="display:none;"><i class="fab fa-facebook-f"></i></a>
+                    <a id="lightboxDriverInstagram" href="#" target="_blank" class="social-icon instagram-icon" style="display:none;"><i class="fab fa-instagram"></i></a>
+                    <a id="lightboxDriverWhatsApp" href="#" target="_blank" class="social-icon whatsapp-icon" style="display:none;"><i class="fab fa-whatsapp"></i></a>
+                    <a id="lightboxDriverTikTok" href="#" target="_blank" class="social-icon tiktok-icon" style="display:none;"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+            <button class="lightbox-close" id="lightboxClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // بيانات السائقين (مع مسارات صور N1.jpg إلى N7.jpg)
+            const driversData = [
+                // بغداد
+                { id: 1, name: "علي كريم", age: 28, bikeType: "هوندا CB125", phone: "07701234567", governorate: "بغداد", image: "N1.jpg", social: { facebook: "https://www.facebook.com/Ahmed.Zaid.Official", whatsapp: "07701234567", tiktok: "https://www.tiktok.com/@example_tiktok" } },
+                { id: 2, name: "حسن فؤاد", age: 32, bikeType: "سوزوكي GS150", phone: "07802345678", governorate: "بغداد", image: "N2.jpg", social: { instagram: "https://www.instagram.com/example_insta", whatsapp: "07802345678" } },
+                { id: 3, name: "عباس خليل", age: 25, bikeType: "ياماها YBR125", phone: "07713456789", governorate: "بغداد", image: "N3.jpg", social: { facebook: "https://www.facebook.com/Aliya.Kazim.Profile", instagram: "https://www.instagram.com/example_ig", whatsapp: "07713456789" } },
+                { id: 4, name: "حيدر علي", age: 30, bikeType: "كيواي سوبرلايت", phone: "07709876543", governorate: "بغداد", image: "N4.jpg", social: { tiktok: "https://www.tiktok.com/@another_tiktok", whatsapp: "07709876543" } },
+                { id: 5, name: "أحمد جاسم", age: 29, bikeType: "دايون 150", phone: "07711223344", governorate: "بغداد", image: "N5.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000001", whatsapp: "07711223344" } },
+                { id: 6, name: "محمد صادق", age: 35, bikeType: "بجاج بولسار", phone: "07722334455", governorate: "بغداد", image: "N6.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000002", whatsapp: "07722334455" } },
+                { id: 7, name: "زياد عامر", age: 27, bikeType: "تي في اس أباتشي", phone: "07733445566", governorate: "بغداد", image: "N7.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000003", whatsapp: "07733445566" } },
+
+                // البصرة
+                { id: 8, name: "قاسم محمود", age: 31, bikeType: "هوندا CB125", phone: "07904567890", governorate: "البصرة", image: "N1.jpg", social: { facebook: "https://www.facebook.com/Mohammed.Jasem.Official", whatsapp: "07904567890" } },
+                { id: 9, name: "سامي جاسم", age: 26, bikeType: "سوزوكي GS150", phone: "07725678901", governorate: "البصرة", image: "N2.jpg", social: { facebook: "https://www.facebook.com/example.basra.driver2", whatsapp: "07725678901" } },
+                { id: 10, name: "زياد خالد", age: 33, bikeType: "ياماها YBR125", phone: "07812345678", governorate: "البصرة", image: "N3.jpg", social: { instagram: "https://www.instagram.com/basra_driver_ig", whatsapp: "07812345678" } },
+                { id: 11, name: "عدنان يوسف", age: 29, bikeType: "كيواي سوبرلايت", phone: "07823456789", governorate: "البصرة", image: "N4.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000004", tiktok: "https://www.tiktok.com/@basra_delivery", whatsapp: "07823456789" } },
+                { id: 12, name: "فراس صباح", age: 24, bikeType: "دايون 150", phone: "07704567890", governorate: "البصرة", image: "N5.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000005", whatsapp: "07704567890" } },
+                { id: 13, name: "عماد حمزة", age: 30, bikeType: "بجاج بولسار", phone: "07715678901", governorate: "البصرة", image: "N6.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000006", whatsapp: "07715678901" } },
+                { id: 14, name: "نورس كريم", age: 28, bikeType: "تي في اس أباتشي", phone: "07836789012", governorate: "البصرة", image: "N7.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000007", whatsapp: "07836789012" } },
+
+                // ذي قار
+                { id: 43, name: "كاظم حسين", age: 28, bikeType: "هوندا CB125", phone: "07735678901", governorate: "ذي قار", image: "N1.jpg", social: { facebook: "https://www.facebook.com/example.dhiqar.driver1", whatsapp: "07735678901" } },
+                { id: 44, name: "جاسم عبد الرضا", age: 32, bikeType: "سوزوكي GS150", phone: "07826789012", governorate: "ذي قار", image: "N2.jpg", social: { instagram: "https://www.instagram.com/dhiqar_delivery", whatsapp: "07826789012" } },
+                { id: 45, name: "صفاء نجم", age: 25, bikeType: "ياماها YBR125", phone: "07736789012", governorate: "ذي قار", image: "N3.jpg", social: { tiktok: "https://www.tiktok.com/@dhiqar_delivery", whatsapp: "07736789012" } },
+                { id: 46, name: "أمين طارق", age: 30, bikeType: "كيواي سوبرلايت", phone: "07707788990", governorate: "ذي قار", image: "N4.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000024", whatsapp: "07707788990" } },
+                { id: 47, name: "مصطفى شاكر", age: 29, bikeType: "daion 150", phone: "07818899001", governorate: "ذي قار", image: "N5.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000025", whatsapp: "07818899001" } },
+                { id: 48, name: "علي عبد الرضا", age: 35, bikeType: "بجاج بولسار", phone: "07729900112", governorate: "ذي قار", image: "N6.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000026", whatsapp: "07729900112" } },
+                { id: 49, name: "مرتضى فاخر", age: 27, bikeType: "تي في اس أباتشي", phone: "07901122334", governorate: "ذي قار", image: "N7.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000027", whatsapp: "07901122334" } },
+
+                // المثنى
+                { id: 50, name: "فؤاد جاسم", age: 29, bikeType: "هوندا", phone: "07705551111", governorate: "المثنى", image: "N1.jpg", social: { whatsapp: "07705551111", tiktok: "https://www.tiktok.com/@muthanna_delivery" } },
+                
+                // القادسية
+                { id: 51, name: "كريم صالح", age: 31, bikeType: "سوزوكي", phone: "07806662222", governorate: "القادسية", image: "N1.jpg", social: { whatsapp: "07806662222", instagram: "https://www.instagram.com/qadisiyah_delivery" } },
+
+                // بابل
+                { id: 52, name: "ياسين طارق", age: 27, bikeType: "ياماها", phone: "07717773333", governorate: "بابل", image: "N1.jpg", social: { whatsapp: "07717773333", facebook: "https://www.facebook.com/babil.delivery" } },
+
+                // كربلاء
+                { id: 22, name: "مروان طارق", age: 28, bikeType: "هوندا CB125", phone: "07908901234", governorate: "كربلاء", image: "N1.jpg", social: { facebook: "https://www.facebook.com/example.karbala.driver1", whatsapp: "07908901234" } },
+                { id: 23, name: "زيدون عامر", age: 32, bikeType: "سوزوكي GS150", phone: "07719012345", governorate: "كربلاء", image: "N2.jpg", social: { facebook: "https://www.facebook.com/example.karbala.driver2", whatsapp: "07719012345" } },
+                { id: 24, name: "فارس مهدي", age: 25, bikeType: "ياماها YBR125", phone: "07901234567", governorate: "كربلاء", image: "N3.jpg", social: { instagram: "https://www.instagram.com/karbala_delivery", whatsapp: "07901234567" } },
+                { id: 25, name: "أمين هادي", age: 30, bikeType: "كيواي سوبرلايت", phone: "07703344556", governorate: "كربلاء", image: "N4.jpg", social: { tiktok: "https://www.tiktok.com/@karbala_tiktok", whatsapp: "07703344556" } },
+                { id: 26, name: "غالب فاضل", age: 29, bikeType: "دايون 150", phone: "07804455667", governorate: "كربلاء", image: "N5.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000013", whatsapp: "07804455667" } },
+                { id: 27, name: "مازن عبد الرزاق", age: 35, bikeType: "بجاج بولسار", phone: "07715566778", governorate: "كربلاء", image: "N6.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000014", whatsapp: "07715566778" } },
+                { id: 28, name: "حسين جبار", age: 27, bikeType: "تي في اس أباتشي", phone: "07906677889", governorate: "كربلاء", image: "N7.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000015", whatsapp: "07906677889" } },
+
+                // النجف
+                { id: 29, name: "رياض سالم", age: 31, bikeType: "هوندا CB125", phone: "07801234567", governorate: "النجف", image: "N1.jpg", social: { facebook: "https://www.facebook.com/example.najaf.driver1", whatsapp: "07801234567" } },
+                { id: 30, name: "عمار هاشم", age: 26, bikeType: "سوزوكي GS150", phone: "07702345678", governorate: "النجف", image: "N2.jpg", social: { facebook: "https://www.facebook.com/example.najaf.driver2", whatsapp: "07702345678" } },
+                { id: 31, name: "نزار كاظم", age: 33, bikeType: "ياماها YBR125", phone: "07723456789", governorate: "النجف", image: "N3.jpg", social: { instagram: "https://www.instagram.com/najaf_delivery", whatsapp: "07723456789" } },
+                { id: 32, name: "وليد صباح", age: 29, bikeType: "كيواي سوبرلايت", phone: "07817788990", governorate: "النجف", image: "N4.jpg", social: { tiktok: "https://www.tiktok.com/@najaf_tiktok", whatsapp: "07817788990" } },
+                { id: 33, name: "مؤيد كاظم", age: 24, bikeType: "دايون 150", phone: "07708899001", governorate: "النجف", image: "N5.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000017", whatsapp: "07708899001" } },
+                { id: 34, name: "حيدر عباس", age: 30, bikeType: "بجاج بولسار", phone: "07719900112", governorate: "النجف", image: "N6.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000018", whatsapp: "07719900112" } },
+                { id: 35, name: "صلاح الدين", age: 28, bikeType: "تي في اس أباتشي", phone: "07901122334", governorate: "النجف", image: "N7.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000019", whatsapp: "07901122334" } },
+
+                // واسط
+                { id: 53, name: "فلاح عبد الله", age: 30, bikeType: "دايون", phone: "07728884444", governorate: "واسط", image: "N1.jpg", social: { whatsapp: "07728884444", facebook: "https://www.facebook.com/wasit.delivery" } },
+
+                // نينوى (الموصل)
+                { id: 15, name: "يوسف احمد", age: 27, bikeType: "هوندا CB125", phone: "07816789012", governorate: "نينوى", image: "N1.jpg", social: { facebook: "https://www.facebook.com/Mustafa.Khaled.Profile", whatsapp: "07816789012" } },
+                { id: 16, name: "حاتم علي", age: 34, bikeType: "سوزوكي GS150", phone: "07707890123", governorate: "نينوى", image: "N2.jpg", social: { instagram: "https://www.instagram.com/mosul_delivery", whatsapp: "07707890123" } },
+                { id: 17, name: "عمر فاروق", age: 26, bikeType: "ياماها YBR125", phone: "07730987654", governorate: "نينوى", image: "N3.jpg", social: { tiktok: "https://www.tiktok.com/@mosul_delivery", whatsapp: "07730987654" } },
+                { id: 18, name: "سامر عبد الله", age: 31, bikeType: "كيواي سوبرلايت", phone: "07708765432", governorate: "نينوى", image: "N4.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000008", whatsapp: "07708765432" } },
+                { id: 19, name: "أسعد رحيم", age: 25, bikeType: "دايون 150", phone: "07819876543", governorate: "نينوى", image: "N5.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000009", whatsapp: "07819876543" } },
+                { id: 20, name: "أكرم شاكر", age: 30, bikeType: "بجاج بولسار", phone: "07901234567", governorate: "نينوى", image: "N6.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000010", whatsapp: "07901234567" } },
+                { id: 21, name: "مقداد جابر", age: 29, bikeType: "تي في اس أباتشي", phone: "07712345678", governorate: "نينوى", image: "N7.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000011", whatsapp: "07712345678" } },
+
+                // أربيل
+                { id: 36, name: "بارزان عادل", age: 27, bikeType: "هوندا CB125", phone: "07503456789", governorate: "أربيل", image: "N1.jpg", social: { facebook: "https://www.facebook.com/example.erbil.driver1", whatsapp: "07503456789" } },
+                { id: 37, name: "سربست محمد", age: 34, bikeType: "سوزوكي GS150", phone: "07514567890", governorate: "أربيل", image: "N2.jpg", social: { instagram: "https://www.instagram.com/erbil_delivery", whatsapp: "07514567890" } },
+                { id: 38, name: "رامان أحمد", age: 26, bikeType: "ياماها YBR125", phone: "07505678901", governorate: "أربيل", image: "N3.jpg", social: { tiktok: "https://www.tiktok.com/@erbil_delivery", whatsapp: "07505678901" } },
+                { id: 39, name: "كاوه رشيد", age: 31, bikeType: "كيواي سوبرلايت", phone: "07516789012", governorate: "أربيل", image: "N4.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000020", whatsapp: "07516789012" } },
+                { id: 40, name: "دلير حميد", age: 25, bikeType: "دايون 150", phone: "07507890123", governorate: "أربيل", image: "N5.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000021", whatsapp: "07507890123" } },
+                { id: 41, name: "ريبر مصطفى", age: 30, bikeType: "بجاج بولسار", phone: "07518901234", governorate: "أربيل", image: "N6.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000022", whatsapp: "07518901234" } },
+                { id: 42, name: "شيرزاد كريم", age: 29, bikeType: "تي في اس أباتشي", phone: "07509012345", governorate: "أربيل", image: "N7.jpg", social: { facebook: "https://www.facebook.com/profile.php?id=1000023", whatsapp: "07509012345" } },
+
+                // السليمانية
+                { id: 54, name: "شهاب محمود", age: 33, bikeType: "تي في اس", phone: "07709995555", governorate: "السليمانية", image: "N1.jpg", social: { whatsapp: "07709995555", instagram: "https://www.instagram.com/sulaymaniyah_delivery" } },
+
+                // دهوك
+                { id: 55, name: "أسامة علي", age: 26, bikeType: "بجاج", phone: "07801116666", governorate: "دهوك", image: "N1.jpg", social: { whatsapp: "07801116666", facebook: "https://www.facebook.com/duhok.delivery" } },
+
+                // كركوك
+                { id: 56, name: "فاروق احمد", age: 35, bikeType: "كيواي", phone: "07712227777", governorate: "كركوك", image: "N1.jpg", social: { whatsapp: "07712227777", tiktok: "https://www.tiktok.com/@kirkuk_delivery" } },
+
+                // الأنبار
+                { id: 57, name: "طارق زياد", age: 28, bikeType: "هوندا", phone: "07903338888", governorate: "الأنبار", image: "N1.jpg", social: { whatsapp: "07903338888", instagram: "https://www.instagram.com/anbar_delivery" } },
+
+                // صلاح الدين
+                { id: 58, name: "أحمد يحيى", age: 30, bikeType: "سوزوكي", phone: "07704449999", governorate: "صلاح الدين", image: "N1.jpg", social: { whatsapp: "07704449999", facebook: "https://www.facebook.com/salahaddin.delivery" } },
+
+                // ديالى
+                { id: 59, name: "رائد جبار", age: 32, bikeType: "ياماها", phone: "07815550000", governorate: "ديالى", image: "N1.jpg", social: { whatsapp: "07815550000", tiktok: "https://www.tiktok.com/@diyala_delivery" } },
+
+                // ميسان
+                { id: 60, name: "علي فاضل", age: 29, bikeType: "دايون", phone: "07726661111", governorate: "ميسان", image: "N1.jpg", social: { whatsapp: "07726661111", instagram: "https://www.instagram.com/maysan_delivery" } }
+            ];
+
+            // تصنيفات المحافظات: سيتم فرزها في JavaScript لضمان الترتيب الأبجدي العربي
+            const orderedGovernorates = [
+                { id: 'anbar-drivers-section', name: 'الأنبار' },
+                { id: 'babil-drivers-section', name: 'بابل' },
+                { id: 'baghdad-drivers-section', name: 'بغداد' },
+                { id: 'basra-drivers-section', name: 'البصرة' },
+                { id: 'duhok-drivers-section', name: 'دهوك' },
+                { id: 'diyala-drivers-section', name: 'ديالى' },
+                { id: 'dhiqar-drivers-section', name: 'ذي قار' },
+                { id: 'erbil-drivers-section', name: 'أربيل' },
+                { id: 'karbala-drivers-section', name: 'كربلاء' },
+                { id: 'kirkuk-drivers-section', name: 'كركوك' },
+                { id: 'maysan-drivers-section', name: 'ميسان' },
+                { id: 'muthanna-drivers-section', name: 'المثنى' },
+                { id: 'najaf-drivers-section', name: 'النجف' },
+                { id: 'ninawa-drivers-section', name: 'نينوى' },
+                { id: 'qadisiyah-drivers-section', name: 'القادسية' },
+                { id: 'salahaddin-drivers-section', name: 'صلاح الدين' },
+                { id: 'sulaymaniyah-drivers-section', name: 'السليمانية' },
+                { id: 'wasit-drivers-section', name: 'واسط' },
+            ].sort((a, b) => a.name.localeCompare(b.name, 'ar', { sensitivity: 'base' })); // فرز أبجدي عربي
+
+            const categoryMapping = orderedGovernorates.reduce((acc, curr) => {
+                acc[curr.id] = curr.name;
+                return acc;
+            }, {});
+
+            // العناصر الرئيسية التي نتعامل معها
+            const splashScreen = document.getElementById('splashScreen');
+            const appContainer = document.getElementById('appContainer');
+            const loadingBar = document.getElementById('loadingBar');
+            const lightbox = document.getElementById('lightbox');
+            const lightboxDriverImg = document.getElementById('lightboxDriverImg');
+            const lightboxDriverName = document.getElementById('lightboxDriverName');
+            const lightboxDriverAge = document.getElementById('lightboxDriverAge');
+            const lightboxBikeType = document.getElementById('lightboxBikeType');
+            const lightboxDriverPhone = document.getElementById('lightboxDriverPhone');
+            const lightboxDriverFacebook = document.getElementById('lightboxDriverFacebook');
+            const lightboxDriverInstagram = document.getElementById('lightboxDriverInstagram');
+            const lightboxDriverWhatsApp = document.getElementById('lightboxDriverWhatsApp');
+            const lightboxDriverTikTok = document.getElementById('lightboxDriverTikTok');
+            const lightboxClose = document.getElementById('lightboxClose');
+            
+            // عناصر زر الإجراء العائم (FAB)
+            const fabButtonBrowse = document.getElementById('fabButtonBrowse');
+            const fabMenuBrowse = document.getElementById('fabMenuBrowse');
+            const heroEndTextContainer = document.getElementById('heroEndTextContainer'); // الحصول على حاوية نص التوجيه
+            const mainCallToActionText = document.getElementById('mainCallToActionText'); // الحصول على حاوية النص الطويل الجديد
+
+
+            // تهيئة الصفحة بعد شاشة البداية
+            function init() {
+                loadingBar.style.width = '100%';
+                setTimeout(() => {
+                    splashScreen.classList.add('hidden');
+                    appContainer.style.display = 'block';
+                    document.querySelector('.hero-section').scrollIntoView({ behavior: 'smooth' });
+                }, 2500); // إجمالي وقت شاشة البداية
+            }
+
+            // وظيفة تحميل معرض السائقين بناءً على المحافظة
+            function loadDriversGallery(governorateId) {
+                const galleryElement = document.getElementById(governorateId);
+                if (!galleryElement) return;
+
+                galleryElement.innerHTML = ''; // مسح المحتوى القديم
+
+                const governorateName = categoryMapping[governorateId];
+                const filteredDrivers = driversData.filter(driver => driver.governorate === governorateName);
+
+                if (filteredDrivers.length > 0) {
+                    filteredDrivers.forEach(driver => {
+                        const driverCard = document.createElement('div');
+                        driverCard.classList.add('gallery-item');
+                        driverCard.dataset.driverId = driver.id; // لتخزين ID السائق
+
+                        driverCard.innerHTML = `
+                            <div class="gallery-img-wrapper">
+                                <img class="gallery-img" src="${driver.image}" alt="صورة ${driver.name}">
+                                <div class="img-overlay"></div>
+                            </div>
+                            <div class="driver-info-preview">
+                                <h3>${driver.name}</h3>
+                                <p>العمر: ${driver.age || 'غير متوفر'}</p>
+                            </div>
+                        `;
+
+                        // عند الضغط على البطاقة، افتح اللايت بوكس مع تفاصيل السائق
+                        driverCard.addEventListener('click', () => openLightbox(driver.id));
+                        galleryElement.appendChild(driverCard);
+                    });
+                } else {
+                    galleryElement.innerHTML = `<p style="text-align: center; color: #555; font-size: 1.2em;">لا يوجد سائقو دلفري متاحون في ${governorateName} حالياً.</p>`;
+                }
+            }
+
+            // فتح اللايت بوكس وعرض تفاصيل السائق
+            function openLightbox(driverId) {
+                const driver = driversData.find(d => d.id === driverId);
+
+                if (driver) {
+                    lightboxDriverImg.src = driver.image;
+                    lightboxDriverName.textContent = driver.name;
+                    lightboxDriverAge.textContent = driver.age || 'غير متوفر';
+                    lightboxBikeType.textContent = driver.bikeType || 'غير متوفر';
+                    
+                    // رابط الاتصال الفوري
+                    lightboxDriverPhone.href = `tel:${driver.phone}`;
+                    lightboxDriverPhone.textContent = `اتصال فوري: ${driver.phone}`;
+                    lightboxDriverPhone.classList.add('phone-link');
+
+                    // إخفاء جميع روابط التواصل الاجتماعي أولاً
+                    lightboxDriverFacebook.style.display = 'none';
+                    lightboxDriverInstagram.style.display = 'none';
+                    lightboxDriverWhatsApp.style.display = 'none';
+                    lightboxDriverTikTok.style.display = 'none';
+
+                    // عرض روابط التواصل الاجتماعي إذا كانت متاحة
+                    if (driver.social) {
+                        if (driver.social.facebook) {
+                            lightboxDriverFacebook.href = driver.social.facebook;
+                            lightboxDriverFacebook.style.display = 'inline-block';
+                        }
+                        if (driver.social.instagram) {
+                            lightboxDriverInstagram.href = driver.social.instagram;
+                            lightboxDriverInstagram.style.display = 'inline-block';
+                        }
+                        if (driver.social.whatsapp) {
+                            lightboxDriverWhatsApp.href = `https://wa.me/${driver.social.whatsapp.replace(/\+/g, '').replace(/\s/g, '')}`;
+                            lightboxDriverWhatsApp.style.display = 'inline-block';
+                        }
+                        if (driver.social.tiktok) {
+                            lightboxDriverTikTok.href = driver.social.tiktok;
+                            lightboxDriverTikTok.style.display = 'inline-block';
+                        }
+                    }
+                    
+                    lightbox.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+
+            // إغلاق اللايت بوكس
+            function closeLightbox() {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+
+            // وظيفة ديناميكية لإنشاء أزرار المحافظات وفرزها
+            function createProvinceButtons() {
+                fabMenuBrowse.innerHTML = '';
+                orderedGovernorates.forEach((gov, index) => {
+                    const button = document.createElement('button');
+                    button.classList.add('fab-menu-item-browse');
+                    button.dataset.section = gov.id;
+                    button.textContent = gov.name;
+                    // تطبيق تأخير الحركة المتتالية فقط على الشاشات الأكبر
+                    if (window.matchMedia("(min-width: 769px)").matches) {
+                        button.style.transitionDelay = `${0.03 * (index + 1)}s`;
+                    }
+                    button.addEventListener('click', () => {
+                        changeSection(gov.id);
+                    });
+                    fabMenuBrowse.appendChild(button);
+                });
+            }
+
+            // تغيير القسم (المحافظة) النشط
+            function changeSection(sectionId) {
+                document.querySelectorAll('.category-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                    loadDriversGallery(sectionId);
+                    targetSection.scrollIntoView({ behavior: 'smooth' });
+                }
+                fabMenuBrowse.classList.remove('active');
+                // إخفاء حاوية نص التوجيه عند فتح قسم جديد
+                heroEndTextContainer.classList.add('hidden');
+                // إخفاء النص الطويل الجديد عند فتح قسم جديد
+                mainCallToActionText.classList.add('hidden');
+            }
+
+            // إضافة مستمعي الأحداث (Event Listeners)
+            lightboxClose.addEventListener('click', closeLightbox);
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) {
+                    closeLightbox();
+                }
+            });
+
+            // تبديل قائمة FAB عند الضغط على الزر الرئيسي
+            fabButtonBrowse.addEventListener('click', () => {
+                fabMenuBrowse.classList.toggle('active');
+            });
+
+            // إغلاق قائمة FAB إذا تم النقر خارجها
+            document.addEventListener('click', (e) => {
+                const fabBrowseContainer = document.getElementById('fab-container-browse');
+                if (fabBrowseContainer && !fabBrowseContainer.contains(e.target) && fabMenuBrowse.classList.contains('active')) {
+                    fabMenuBrowse.classList.remove('active');
+                }
+            });
+
+            // بدء تهيئة التطبيق
+            init();
+
+            // إنشاء أزرار المحافظات وفرزها عند تحميل الصفحة
+            createProvinceButtons();
+
+            // تحميل بيانات السائقين لجميع الأقسام افتراضياً (لكن الأقسام تظل مخفية)
+            // هذا يضمن أن البيانات جاهزة للعرض بمجرد النقر على زر المحافظة
+            for (const section of orderedGovernorates) {
+                loadDriversGallery(section.id);
+            }
+            // التأكد من عدم وجود أي قسم نشط افتراضياً عند التحميل لتجنب ظهور الصور مباشرة
+            document.getElementById('baghdad-drivers-section').classList.remove('active');
+        });
+    </script>
+</body>
+</html>
